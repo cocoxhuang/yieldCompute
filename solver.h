@@ -3,13 +3,7 @@
 
 #include <iostream>
 
-class function{
-    public:
-        virtual double f(double x) = 0;
-        virtual double df(double x) = 0;
-};
-
-class quadratic : public function{
+class quadratic{
     private:
         double a;   // f(x) = x^2 -a;
     public:
@@ -18,7 +12,7 @@ class quadratic : public function{
         double df(double x){return 2*x;}
 };
 
-double solveByBisect(function* func, double target, double lEnd, double rEnd, double acc){
+template<typename function> double solveByBisect(function* func, double target, double lEnd, double rEnd, double acc){
     double l = lEnd;
     double r = rEnd;
     double mid = (l + r)/2;
@@ -37,7 +31,7 @@ double solveByBisect(function* func, double target, double lEnd, double rEnd, do
     return mid;
 }
 
-double solveByNewton(function* func, double target, double x0, double acc){
+template<typename function> double solveByNewton(function* func, double target, double x0, double acc){
     double x_cur = x0;
     double x_next = x_cur - (func->f(x_cur) - target)/(func->df(x_cur));
     while (x_next - x_cur > acc || x_cur - x_next > acc){

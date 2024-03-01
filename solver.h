@@ -3,14 +3,27 @@
 
 #include <iostream>
 
-double solveByBisect(double(*func)(double x), double target, double lEnd, double rEnd, double acc){
+class function{
+    public:
+        virtual double f(double x) = 0;
+        virtual double df(double x) = 0;
+};
+
+class quadratic : public function{
+    private:
+        double a;   // f(x) = x^2 -a;
+    public:
+        quadratic(double a_){a = a_;}
+        double f(double x){return x*x - a;}
+        double df(double x){return 2*x;}
+};
+
+double solveByBisect(function* func, double target, double lEnd, double rEnd, double acc){
     double l = lEnd;
     double r = rEnd;
     double mid = (l + r)/2;
-
-    double y_l = func(l) - target;
-    double y_mid = func(mid) - target;
-
+    double y_l = func->f(l) - target;
+    double y_mid = func->f(mid) - target;
     while ((mid - l) > acc){
         if(y_l * y_mid < 0){
             r = mid;
@@ -19,17 +32,17 @@ double solveByBisect(double(*func)(double x), double target, double lEnd, double
             y_l = y_mid;
         }
         mid = (l+r)/2;
-        y_mid = func(mid) - target;
+        y_mid = func->f(mid) - target;
     }
     return mid;
 }
 
-double solveByNewton(double(*func)(double x), double(*Dfunc)(double x), double target, double x0, double acc){
+double solveByNewton(function* func, double target, double x0, double acc){
     double x_cur = x0;
-    double x_next = x_cur - (func(x_cur) - target)/(Dfunc(x_cur));
+    double x_next = x_cur - (func->f(x_cur) - target)/(func->df(x_cur));
     while (x_next - x_cur > acc || x_cur - x_next > acc){
         x_cur = x_next;
-        x_next = x_cur - (func(x_cur) - target)/(Dfunc(x_cur));
+        x_next = x_cur - (func->f(x_cur) - target)/(func->df(x_cur));
     }
     return x_next;
 }

@@ -2,14 +2,34 @@
 #define solver_h
 
 #include <iostream>
+#include <cmath>
 
-class quadratic{
+using namespace std;
+
+class bondPrice{
+    /*
+    functions related to bond price that distributes annual coupons.
+    */
     private:
-        double a;   // f(x) = x^2 -a;
+        int T;              // time to maturity
+        double c;           // fixed annual coupon value
+        double F;           // face value
     public:
-        quadratic(double a_){a = a_;}
-        double f(double x){return x*x - a;}
-        double df(double x){return 2*x;}
+        bondPrice(int T_, double c_, double F_){T = T_; c = c_; F = F_;}
+        double f(double y){
+            double p = 0;       // price of bond
+            for (int i = 1; i <= T; i++){
+                p = p + c*exp(-y * i);
+            }
+            return p + F * exp(-y * T);
+            }
+        double df(double y){
+            double dp;          // derivative of price of bond
+            for (int i = 1; i <= T; i++){
+                dp = dp + c * -i* exp(-y * i);
+            }
+            return dp + F * -T * exp(-y * T);
+        }
 };
 
 template<typename function> double solveByBisect(function* func, double target, double lEnd, double rEnd, double acc){
